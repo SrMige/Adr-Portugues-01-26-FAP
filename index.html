@@ -7757,12 +7757,52 @@
             cisternas: {},
             explosivos: {}
         };
+        let savedStartIndices = {
+            base: 0,
+            cisternas: 0,
+            explosivos: 0
+        };
         let isRandomMode = false;
         let isFailedMode = false;
         let isTestMode = false;
 
         function updateCurrentQuestions() {
             currentQuestions = questionBanks[selectedBank];
+        }
+
+        function loadSavedStartIndices() {
+            try {
+                const saved = localStorage.getItem('adrSavedStartIndices');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    savedStartIndices = {
+                        base: parsed.base ?? 0,
+                        cisternas: parsed.cisternas ?? 0,
+                        explosivos: parsed.explosivos ?? 0
+                    };
+                }
+            } catch (error) {
+                console.warn('Não foi possível carregar o progresso salvo:', error);
+            }
+        }
+
+        function persistSavedStartIndices() {
+            try {
+                localStorage.setItem('adrSavedStartIndices', JSON.stringify(savedStartIndices));
+            } catch (error) {
+                console.warn('Não foi possível salvar o progresso:', error);
+            }
+        }
+
+        function saveCurrentNormalProgress() {
+            if (!isRandomMode && !isFailedMode) {
+                savedStartIndices[selectedBank] = currentStartIndex;
+                persistSavedStartIndices();
+            }
+        }
+
+        function restoreStartIndexForBank(bank) {
+            currentStartIndex = Math.min(savedStartIndices[bank] || 0, currentQuestions.length - 1);
         }
 
         function getQuizLength() {
@@ -7957,10 +7997,20 @@
         }
 
         function switchBank(bank) {
+            saveCurrentNormalProgress();
             selectedBank = bank;
             updateCurrentQuestions();
-            resetPaging();
-            currentSequence = buildCurrentSequence();
+            currentSequenceIndex = 0;
+            currentSequence = [];
+            restoreStartIndexForBank(bank);
+            userAnswers[selectedBank] = [];
+            answeredQuestions[selectedBank] = [];
+            wrongQuestions[selectedBank] = [];
+            isRandomMode = false;
+            isFailedMode = false;
+            document.getElementById('normalModeBtn').style.backgroundColor = '#007bff';
+            document.getElementById('randomModeBtn').style.backgroundColor = '#6c757d';
+            document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
             highlightBankButton();
             updateScoreDisplay();
             renderQuestions();
@@ -7979,9 +8029,11 @@
         document.getElementById('normalModeBtn').addEventListener('click', () => {
             isRandomMode = false;
             isFailedMode = false;
-            currentStartIndex = 0;
+            restoreStartIndexForBank(selectedBank);
             currentSequence = buildCurrentSequence();
             currentSequenceIndex = 0;
+            userAnswers[selectedBank] = [];
+            answeredQuestions[selectedBank] = [];
             document.getElementById('normalModeBtn').style.backgroundColor = '#007bff';
             document.getElementById('randomModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
@@ -7995,6 +8047,8 @@
             currentStartIndex = 0;
             currentSequence = buildCurrentSequence();
             currentSequenceIndex = 0;
+            userAnswers[selectedBank] = [];
+            answeredQuestions[selectedBank] = [];
             document.getElementById('normalModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('randomModeBtn').style.backgroundColor = '#007bff';
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
@@ -8008,7 +8062,6 @@
             currentStartIndex = 0;
             currentSequence = buildCurrentSequence();
             currentSequenceIndex = 0;
-            // Clear previous answers
             userAnswers[selectedBank] = [];
             answeredQuestions[selectedBank] = [];
             document.getElementById('normalModeBtn').style.backgroundColor = '#6c757d';
@@ -8033,6 +8086,7 @@
         });
 
         document.getElementById('submitBtn').addEventListener('click', () => {
+            saveCurrentNormalProgress();
             let score = 0;
             const answers = userAnswers[selectedBank];
             const questionIndexes = getCurrentQuestionIndexes();
@@ -8161,7 +8215,9 @@
         });
 
         // Initialize the quiz
+        loadSavedStartIndices();
         highlightBankButton();
+        restoreStartIndexForBank(selectedBank);
         currentSequence = buildCurrentSequence();
         
         // Easter egg

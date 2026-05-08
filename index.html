@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5476471810497045"
+     crossorigin="anonymous"></script>
+     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador ADR</title>
@@ -181,6 +187,15 @@
         }
     </style>
 </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+
+
+</body>
+</html>
 <body>
     <div class="container">
         <h1>Simulador de Perguntas <span id="easterEggTrigger" style="cursor: pointer; user-select: none;">ADR</span></h1>
@@ -7719,13 +7734,14 @@
 
         ];
 
-        const questionBanks = {
+    const questionBanks = {
             base: questionsData,
             cisternas: cisternasQuestions,
             explosivos: explosivosQuestions
         };
 
         const quizLimit = 25;
+
 
         let selectedBank = 'base';
         let currentQuestions = questionBanks[selectedBank];
@@ -7809,8 +7825,7 @@
             if (!isRandomMode) {
                 return Math.min(Math.max(currentQuestions.length - currentStartIndex, 0), quizLimit);
             }
-            return Math.min(currentQuestions.length, quizLimit);
-        }
+return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
 
         function buildCurrentSequence() {
             if (isRandomMode) {
@@ -8265,4 +8280,7 @@
         renderQuestions();
     </script>
 </body>
+<amp-auto-ads type="adsense"
+        data-ad-client="ca-pub-5476471810497045">
+</amp-auto-ads>
 </html>

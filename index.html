@@ -218,6 +218,8 @@
             <span style="color: #dc3545; font-weight: bold;">Erradas: <span id="incorrectCount">0</span></span>
             <span style="margin: 0 15px;">|</span>
             <span>Total: <span id="answeredCount">0</span></span>
+            <span style="margin: 0 15px;">|</span>
+            <span>Tempo: <span id="timerDisplay">00:00</span></span>
         </div>
 
         <div id="quiz">
@@ -7747,6 +7749,37 @@
         let currentQuestions = questionBanks[selectedBank];
         let currentSequence = [];
         let currentSequenceIndex = 0;
+        let timerInterval = null;
+        let elapsedSeconds = 0;
+
+        function formatTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function updateTimerDisplay() {
+            const timerEl = document.getElementById('timerDisplay');
+            if (timerEl) timerEl.textContent = formatTime(elapsedSeconds);
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                elapsedSeconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function resetTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            elapsedSeconds = 0;
+            updateTimerDisplay();
+            startTimer();
+        }
         let currentStartIndex = 0;
         let userAnswers = {
             base: [],
@@ -8028,6 +8061,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
             highlightBankButton();
             updateScoreDisplay();
+            resetTimer();
             renderQuestions();
         }
 
@@ -8053,6 +8087,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('randomModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
             updateScoreDisplay();
+            resetTimer();
             renderQuestions();
         });
 
@@ -8068,6 +8103,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('randomModeBtn').style.backgroundColor = '#007bff';
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
             updateScoreDisplay();
+            resetTimer();
             renderQuestions();
         });
 
@@ -8226,6 +8262,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('continueBtn').style.display = 'none';
             updateScoreDisplay();
+            resetTimer();
             renderQuestions();
         });
 
@@ -8234,7 +8271,9 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
         highlightBankButton();
         restoreStartIndexForBank(selectedBank);
         currentSequence = buildCurrentSequence();
-        
+        updateTimerDisplay();
+        startTimer();
+
         // Easter egg
         document.getElementById('easterEggTrigger').addEventListener('click', () => {
             const password = prompt('🔐 Insira a senha para revelar um segredo:');

@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <script async custom-element="amp-auto-ads"
-        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
-</script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5476471810497045"
      crossorigin="anonymous"></script>
-     
+<meta name="google-adsense-account" content="ca-pub-5476471810497045">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador ADR</title>
@@ -159,6 +157,46 @@
             margin-bottom: 10px;
         }
 
+
+        .top-ads {
+            margin-bottom: 10px;
+        }
+
+        .bank-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .bank-buttons button {
+            flex: 1;
+            max-width: 180px;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .top-ads {
+                margin-bottom: 5px;
+            }
+
+            .container {
+                margin-top: 5px;
+                padding: 15px;
+            }
+
+            .bank-buttons button {
+                padding: 10px 8px !important;
+                font-size: 0.9em;
+                margin: 0 !important;
+            }
+        }
+
+
         #restartBtn {
             background-color: #dc3545;
             color: white;
@@ -185,7 +223,178 @@
                 margin-right: 0;
             }
         }
+    
+        .bank-buttons,
+        .mode-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                margin-top: 10px;
+                padding: 15px;
+            }
+
+            .bank-buttons,
+            .mode-buttons {
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+            }
+
+            .bank-buttons button,
+            .mode-buttons button {
+                min-width: 140px;
+            }
+
+            amp-auto-ads {
+                display: none !important;
+            }
+
+            .top-ad,
+            .side-ad {
+                display: none !important;
+            }
+
+            .bottom-ads {
+                display: block !important;
+                margin-top: 20px;
+                text-align: center;
+            }
+        }
+
+    
+        .mode-buttons,
+        .bank-buttons {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 8px !important;
+            flex-wrap: nowrap !important;
+            width: 100%;
+        }
+
+        .mode-buttons button,
+        .bank-buttons button {
+            flex: 1 1 0 !important;
+            min-width: 0 !important;
+            white-space: nowrap !important;
+        }
+
+        @media (max-width: 768px) {
+            .mode-buttons button,
+            .bank-buttons button {
+                font-size: 12px !important;
+                padding: 10px 4px !important;
+            }
+        }
+
+
+        #aswift_1_host,
+        [id^="aswift_"] {
+            display: none !important;
+            height: 0 !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+
+</style>
+
+<style>
+@media (max-width: 768px) {
+    body {
+        padding: 10px !important;
+        font-size: 16px !important;
+    }
+
+    .container, .quiz-container {
+        width: 100% !important;
+        padding: 10px !important;
+    }
+
+    button {
+        width: 100% !important;
+        margin-top: 10px !important;
+        font-size: 16px !important;
+    }
+
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+}
+.timer-box{
+    position:fixed;
+    top:10px;
+    right:10px;
+    background:#111;
+    color:#fff;
+    padding:10px 15px;
+    border-radius:10px;
+    z-index:9999;
+    font-weight:bold;
+}
+
+        .bank-buttons,
+        .mode-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                margin-top: 10px;
+                padding: 15px;
+            }
+
+            .bank-buttons,
+            .mode-buttons {
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+            }
+
+            .bank-buttons button,
+            .mode-buttons button {
+                min-width: 140px;
+            }
+
+            amp-auto-ads {
+                display: none !important;
+            }
+
+            .top-ad,
+            .side-ad {
+                display: none !important;
+            }
+
+            .bottom-ads {
+                display: block !important;
+                margin-top: 20px;
+                text-align: center;
+            }
+        }
+
     </style>
+
 </head>
 <!DOCTYPE html>
 <html lang="en">
@@ -194,13 +403,59 @@
 
 
 
+
+
+
+
+<script>
+
+function salvarRanking(nome, pontos, tempo) {
+    let ranking = JSON.parse(localStorage.getItem('rankingQuiz')) || [];
+
+    ranking.push({
+        nome: nome || 'Jogador',
+        pontos: pontos,
+        tempo: tempo
+    });
+
+    ranking.sort((a,b) => b.pontos - a.pontos);
+
+    ranking = ranking.slice(0,10);
+
+    localStorage.setItem('rankingQuiz', JSON.stringify(ranking));
+
+    mostrarRanking();
+}
+
+function mostrarRanking() {
+    let ranking = JSON.parse(localStorage.getItem('rankingQuiz')) || [];
+
+    let html = '<ol>';
+
+    ranking.forEach(r => {
+        html += `<li><strong>${r.nome}</strong> - ${r.pontos} pts - ${r.tempo}</li>`;
+    });
+
+    html += '</ol>';
+
+    let lista = document.getElementById('rankingLista');
+
+    if(lista){
+        lista.innerHTML = html;
+    }
+}
+
+window.addEventListener('load', mostrarRanking);
+</script>
+
 </body>
 </html>
 <body>
+<div class="timer-box">Tempo: <span id="timer">00:00</span></div>
     <div class="container">
         <h1>Simulador de Perguntas <span id="easterEggTrigger" style="cursor: pointer; user-select: none;">ADR</span></h1>
 
-        <div class="bank-buttons" style="text-align: center; margin-bottom: 15px;">
+        <div class="bank-buttons" style="margin-bottom: 15px;">
             <button id="bankBaseBtn" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 5px;">Base</button>
             <button id="bankCisternasBtn" style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 5px;">Cisternas</button>
             <button id="bankExplosivosBtn" style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 5px;">Explosivos</button>
@@ -218,8 +473,6 @@
             <span style="color: #dc3545; font-weight: bold;">Erradas: <span id="incorrectCount">0</span></span>
             <span style="margin: 0 15px;">|</span>
             <span>Total: <span id="answeredCount">0</span></span>
-            <span style="margin: 0 15px;">|</span>
-            <span>Tempo: <span id="timerDisplay">00:00</span></span>
         </div>
 
         <div id="quiz">
@@ -7742,44 +7995,17 @@
             explosivos: explosivosQuestions
         };
 
-        const quizLimit = 25;
+        const quizLimit = {
+            base: 25,
+            cisternas: 15,
+            explosivos: 15
+        };
 
 
         let selectedBank = 'base';
         let currentQuestions = questionBanks[selectedBank];
         let currentSequence = [];
         let currentSequenceIndex = 0;
-        let timerInterval = null;
-        let elapsedSeconds = 0;
-
-        function formatTime(totalSeconds) {
-            const minutes = Math.floor(totalSeconds / 60);
-            const seconds = totalSeconds % 60;
-            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        }
-
-        function updateTimerDisplay() {
-            const timerEl = document.getElementById('timerDisplay');
-            if (timerEl) timerEl.textContent = formatTime(elapsedSeconds);
-        }
-
-        function startTimer() {
-            if (timerInterval) return;
-            timerInterval = setInterval(() => {
-                elapsedSeconds++;
-                updateTimerDisplay();
-            }, 1000);
-        }
-
-        function resetTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
-            elapsedSeconds = 0;
-            updateTimerDisplay();
-            startTimer();
-        }
         let currentStartIndex = 0;
         let userAnswers = {
             base: [],
@@ -7814,6 +8040,10 @@
         let isRandomMode = false;
         let isFailedMode = false;
         let isTestMode = false;
+
+        let timerInterval = null;
+        let startTime = null;
+        let elapsedSeconds = 0;
 
         function updateCurrentQuestions() {
             currentQuestions = questionBanks[selectedBank];
@@ -7856,7 +8086,7 @@
 
         function getQuizLength() {
             if (!isRandomMode) {
-                return Math.min(Math.max(currentQuestions.length - currentStartIndex, 0), quizLimit);
+                return Math.min(Math.max(currentQuestions.length - currentStartIndex, 0), quizLimit[selectedBank]);
             }
 return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
 
@@ -8026,6 +8256,31 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             radios.forEach(radio => radio.disabled = true);
         }
 
+        function startTimer() {
+            clearInterval(timerInterval);
+
+            startTime = Date.now();
+            elapsedSeconds = 0;
+
+            const timer = document.getElementById('timer');
+
+            if (timer) {
+                timer.textContent = '00:00';
+            }
+
+            timerInterval = setInterval(() => {
+                elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+
+                if (timer) {
+                    timer.textContent = elapsedSeconds + 's';
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
         function updateButtons() {
             const total = currentSequence.length || getQuizLength();
             const current = Math.max(Math.min(currentSequenceIndex, total - 1), 0);
@@ -8061,7 +8316,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
             highlightBankButton();
             updateScoreDisplay();
-            resetTimer();
+            startTimer();
             renderQuestions();
         }
 
@@ -8087,7 +8342,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('randomModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
             updateScoreDisplay();
-            resetTimer();
+            startTimer();
             renderQuestions();
         });
 
@@ -8103,7 +8358,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('randomModeBtn').style.backgroundColor = '#007bff';
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
             updateScoreDisplay();
-            resetTimer();
+            startTimer();
             renderQuestions();
         });
 
@@ -8119,6 +8374,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('randomModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('failedModeBtn').style.backgroundColor = '#007bff';
             updateScoreDisplay();
+            startTimer();
             renderQuestions();
         });
 
@@ -8152,7 +8408,8 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             const percentage = Math.round((score / totalQuestions) * 100);
             document.getElementById('score').textContent = score;
             document.getElementById('totalQuestions').textContent = totalQuestions;
-            document.getElementById('percentage').textContent = percentage;
+            document.getElementById('percentage').textContent = `${percentage}% (${elapsedSeconds}s)`;
+            stopTimer();
             document.getElementById('resultContainer').style.display = 'block';
             document.getElementById('quiz').style.display = 'none';
             document.querySelector('.navigation-buttons').style.display = 'none';
@@ -8262,7 +8519,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('continueBtn').style.display = 'none';
             updateScoreDisplay();
-            resetTimer();
+            startTimer();
             renderQuestions();
         });
 
@@ -8271,9 +8528,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
         highlightBankButton();
         restoreStartIndexForBank(selectedBank);
         currentSequence = buildCurrentSequence();
-        updateTimerDisplay();
-        startTimer();
-
+        
         // Easter egg
         document.getElementById('easterEggTrigger').addEventListener('click', () => {
             const password = prompt('🔐 Insira a senha para revelar um segredo:');
@@ -8318,8 +8573,74 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
         
         renderQuestions();
     </script>
+
+
+<script>
+
+
+function salvarRanking(nome, pontos, tempo) {
+    let ranking = JSON.parse(localStorage.getItem('rankingQuiz')) || [];
+
+    ranking.push({
+        nome: nome || 'Jogador',
+        pontos: pontos,
+        tempo: tempo
+    });
+
+    ranking.sort((a,b) => b.pontos - a.pontos);
+
+    ranking = ranking.slice(0,10);
+
+    localStorage.setItem('rankingQuiz', JSON.stringify(ranking));
+
+    mostrarRanking();
+}
+
+function mostrarRanking() {
+    let ranking = JSON.parse(localStorage.getItem('rankingQuiz')) || [];
+
+    let html = '<ol>';
+
+    ranking.forEach(r => {
+        html += `<li><strong>${r.nome}</strong> - ${r.pontos} pts - ${r.tempo}</li>`;
+    });
+
+    html += '</ol>';
+
+    let lista = document.getElementById('rankingLista');
+
+    if(lista){
+        lista.innerHTML = html;
+    }
+}
+
+window.addEventListener('load', mostrarRanking);
+
+
+let segundos = 0;
+let intervaloTimer = null;
+
+function atualizarTimer() {
+    segundos++;
+    let min = String(Math.floor(segundos / 60)).padStart(2, '0');
+    let sec = String(segundos % 60).padStart(2, '0');
+    document.getElementById('timer').innerText = `${min}:${sec}`;
+}
+
+function iniciarTimer() {
+    if(intervaloTimer) clearInterval(intervaloTimer);
+    segundos = 0;
+    document.getElementById('timer').innerText = '00:00';
+    intervaloTimer = setInterval(atualizarTimer, 1000);
+}
+
+window.addEventListener('load', iniciarTimer);
+
+</script>
+
+
+
+
 </body>
-<amp-auto-ads type="adsense"
-        data-ad-client="ca-pub-5476471810497045">
-</amp-auto-ads>
+
 </html>

@@ -8448,6 +8448,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('repeatWrongBtn').style.display = 'none';
             document.getElementById('repeatWrongTestBtn').style.display = 'none';
             isTestMode = false;
+            startTimer();
             
             renderQuestions();
         });
@@ -8475,6 +8476,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.querySelector('.navigation-buttons').style.display = 'block';
             document.getElementById('repeatWrongBtn').style.display = 'none';
             document.getElementById('repeatWrongTestBtn').style.display = 'none';
+            startTimer();
             
             renderQuestions();
         });
@@ -8498,6 +8500,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('normalModeBtn').style.backgroundColor = (!isRandomMode && !isFailedMode) ? '#007bff' : '#6c757d';
             document.getElementById('randomModeBtn').style.backgroundColor = isRandomMode ? '#007bff' : '#6c757d';
             document.getElementById('failedModeBtn').style.backgroundColor = isFailedMode ? '#007bff' : '#6c757d';
+            startTimer();
             renderQuestions();
         });
 
@@ -8634,7 +8637,8 @@ function iniciarTimer() {
     intervaloTimer = setInterval(atualizarTimer, 1000);
 }
 
-window.addEventListener('load', iniciarTimer);
+// Timer principal já é iniciado por startTimer() no fluxo do quiz.
+// Evita reinícios duplicados e competição entre temporizadores.
 
 </script>
 

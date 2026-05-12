@@ -396,60 +396,6 @@
     </style>
 
 </head>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-
-
-
-
-
-
-
-<script>
-
-function salvarRanking(nome, pontos, tempo) {
-    let ranking = JSON.parse(localStorage.getItem('rankingQuiz')) || [];
-
-    ranking.push({
-        nome: nome || 'Jogador',
-        pontos: pontos,
-        tempo: tempo
-    });
-
-    ranking.sort((a,b) => b.pontos - a.pontos);
-
-    ranking = ranking.slice(0,10);
-
-    localStorage.setItem('rankingQuiz', JSON.stringify(ranking));
-
-    mostrarRanking();
-}
-
-function mostrarRanking() {
-    let ranking = JSON.parse(localStorage.getItem('rankingQuiz')) || [];
-
-    let html = '<ol>';
-
-    ranking.forEach(r => {
-        html += `<li><strong>${r.nome}</strong> - ${r.pontos} pts - ${r.tempo}</li>`;
-    });
-
-    html += '</ol>';
-
-    let lista = document.getElementById('rankingLista');
-
-    if(lista){
-        lista.innerHTML = html;
-    }
-}
-
-window.addEventListener('load', mostrarRanking);
-</script>
-
-</body>
-</html>
 <body>
 <div class="timer-box">Tempo: <span id="timer">00:00</span></div>
     <div class="container">
@@ -8272,7 +8218,9 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
                 elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
 
                 if (timer) {
-                    timer.textContent = elapsedSeconds + 's';
+                    const min = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+                    const sec = String(elapsedSeconds % 60).padStart(2, '0');
+                    timer.textContent = `${min}:${sec}`;
                 }
             }, 1000);
         }
@@ -8620,24 +8568,6 @@ function mostrarRanking() {
 window.addEventListener('load', mostrarRanking);
 
 
-let segundos = 0;
-let intervaloTimer = null;
-
-function atualizarTimer() {
-    segundos++;
-    let min = String(Math.floor(segundos / 60)).padStart(2, '0');
-    let sec = String(segundos % 60).padStart(2, '0');
-    document.getElementById('timer').innerText = `${min}:${sec}`;
-}
-
-function iniciarTimer() {
-    if(intervaloTimer) clearInterval(intervaloTimer);
-    segundos = 0;
-    document.getElementById('timer').innerText = '00:00';
-    intervaloTimer = setInterval(atualizarTimer, 1000);
-}
-
-// Timer principal já é iniciado por startTimer() no fluxo do quiz.
 // Evita reinícios duplicados e competição entre temporizadores.
 
 </script>

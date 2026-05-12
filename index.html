@@ -410,6 +410,7 @@
         <div class="mode-buttons" style="text-align: center; margin-bottom: 20px;">
             <button id="normalModeBtn" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 5px;">Modo Normal</button>
             <button id="randomModeBtn" style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 5px;">Modo Aleatório</button>
+            <button id="extremeRandomModeBtn" style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 5px;">Aleatório Extremo</button>
             <button id="failedModeBtn" style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 0 5px;">Mais Falhadas</button>
         </div>
 
@@ -7984,6 +7985,7 @@
             explosivos: 0
         };
         let isRandomMode = false;
+        let isExtremeRandomMode = false;
         let isFailedMode = false;
         let isTestMode = false;
 
@@ -8020,7 +8022,7 @@
         }
 
         function saveCurrentNormalProgress() {
-            if (!isRandomMode && !isFailedMode) {
+            if (!isRandomMode && !isExtremeRandomMode && !isFailedMode) {
                 savedStartIndices[selectedBank] = currentStartIndex;
                 persistSavedStartIndices();
             }
@@ -8031,13 +8033,13 @@
         }
 
         function getQuizLength() {
-            if (!isRandomMode) {
+            if (!isRandomMode && !isExtremeRandomMode) {
                 return Math.min(Math.max(currentQuestions.length - currentStartIndex, 0), quizLimit[selectedBank]);
             }
 return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
 
         function buildCurrentSequence() {
-            if (isRandomMode) {
+            if (isRandomMode || isExtremeRandomMode) {
                 return shuffleArray([...Array(currentQuestions.length).keys()]).slice(0, getQuizLength());
             } else if (isFailedMode) {
                 // Filter questions with wrong counts > 0 and correct counts < 2, then sort by wrong count descending
@@ -8105,7 +8107,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
 
             const questionText = document.createElement('div');
             questionText.className = 'question-text';
-            const questionNumber = isRandomMode ? currentSequenceIndex + 1 : currentStartIndex + currentSequenceIndex + 1;
+            const questionNumber = (isRandomMode || isExtremeRandomMode) ? currentSequenceIndex + 1 : currentStartIndex + currentSequenceIndex + 1;
             questionText.textContent = `${questionNumber}. ${q.text}`;
             questionDiv.appendChild(questionText);
 
@@ -8114,20 +8116,23 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
 
             const isAnswered = answeredQuestions[selectedBank].includes(qIndex);
 
-            q.options.forEach((option, index) => {
+            const optionEntries = q.options.map((option, index) => ({ option, originalIndex: index }));
+            const displayOptions = isExtremeRandomMode ? shuffleArray([...optionEntries]) : optionEntries;
+
+            displayOptions.forEach(({ option, originalIndex }) => {
                 const label = document.createElement('label');
-                label.id = `option-${index}`;
+                label.id = `option-${originalIndex}`;
                 
                 const radio = document.createElement('input');
                 radio.type = 'radio';
                 radio.name = 'answer';
-                radio.value = index;
-                if (userAnswers[selectedBank][qIndex] === index) {
+                radio.value = originalIndex;
+                if (userAnswers[selectedBank][qIndex] === originalIndex) {
                     radio.checked = true;
                 }
                 radio.addEventListener('change', () => {
-                    userAnswers[selectedBank][qIndex] = index;
-                    showInstantFeedback(index, q.correctAnswerIndex);
+                    userAnswers[selectedBank][qIndex] = originalIndex;
+                    showInstantFeedback(originalIndex, q.correctAnswerIndex);
                     const radios = document.querySelectorAll('input[name="answer"]');
                     radios.forEach(radio => radio.disabled = true);
                     // Mark question as answered
@@ -8135,7 +8140,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
                         answeredQuestions[selectedBank].push(qIndex);
                     }
                     // Track wrong answers
-                    if (index !== q.correctAnswerIndex) {
+                    if (originalIndex !== q.correctAnswerIndex) {
                         if (!wrongQuestions[selectedBank].includes(qIndex)) {
                             wrongQuestions[selectedBank].push(qIndex);
                         }
@@ -8262,6 +8267,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('normalModeBtn').style.backgroundColor = '#007bff';
             document.getElementById('randomModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
+            document.getElementById('extremeRandomModeBtn').style.backgroundColor = '#6c757d';
             highlightBankButton();
             updateScoreDisplay();
             startTimer();
@@ -8281,6 +8287,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
         document.getElementById('normalModeBtn').addEventListener('click', () => {
             isRandomMode = false;
             isFailedMode = false;
+            isExtremeRandomMode = false;
             restoreStartIndexForBank(selectedBank);
             currentSequence = buildCurrentSequence();
             currentSequenceIndex = 0;
@@ -8289,6 +8296,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('normalModeBtn').style.backgroundColor = '#007bff';
             document.getElementById('randomModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
+            document.getElementById('extremeRandomModeBtn').style.backgroundColor = '#6c757d';
             updateScoreDisplay();
             startTimer();
             renderQuestions();
@@ -8297,6 +8305,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
         document.getElementById('randomModeBtn').addEventListener('click', () => {
             isRandomMode = true;
             isFailedMode = false;
+            isExtremeRandomMode = false;
             currentStartIndex = 0;
             currentSequence = buildCurrentSequence();
             currentSequenceIndex = 0;
@@ -8305,6 +8314,25 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('normalModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('randomModeBtn').style.backgroundColor = '#007bff';
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
+            document.getElementById('extremeRandomModeBtn').style.backgroundColor = '#6c757d';
+            updateScoreDisplay();
+            startTimer();
+            renderQuestions();
+        });
+
+        document.getElementById('extremeRandomModeBtn').addEventListener('click', () => {
+            isRandomMode = false;
+            isFailedMode = false;
+            isExtremeRandomMode = true;
+            currentStartIndex = 0;
+            currentSequence = buildCurrentSequence();
+            currentSequenceIndex = 0;
+            userAnswers[selectedBank] = [];
+            answeredQuestions[selectedBank] = [];
+            document.getElementById('normalModeBtn').style.backgroundColor = '#6c757d';
+            document.getElementById('randomModeBtn').style.backgroundColor = '#6c757d';
+            document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
+            document.getElementById('extremeRandomModeBtn').style.backgroundColor = '#007bff';
             updateScoreDisplay();
             startTimer();
             renderQuestions();
@@ -8312,6 +8340,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
 
         document.getElementById('failedModeBtn').addEventListener('click', () => {
             isRandomMode = false;
+            isExtremeRandomMode = false;
             isFailedMode = true;
             currentStartIndex = 0;
             currentSequence = buildCurrentSequence();
@@ -8389,6 +8418,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('normalModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('randomModeBtn').style.backgroundColor = '#007bff';
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
+            document.getElementById('extremeRandomModeBtn').style.backgroundColor = '#6c757d';
             
             document.getElementById('resultContainer').style.display = 'none';
             document.getElementById('quiz').style.display = 'block';
@@ -8418,6 +8448,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('normalModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('randomModeBtn').style.backgroundColor = '#007bff';
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
+            document.getElementById('extremeRandomModeBtn').style.backgroundColor = '#6c757d';
             
             document.getElementById('resultContainer').style.display = 'none';
             document.getElementById('quiz').style.display = 'block';
@@ -8430,7 +8461,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
         });
 
         document.getElementById('continueBtn').addEventListener('click', () => {
-            if (!isRandomMode && !isFailedMode) {
+            if (!isRandomMode && !isExtremeRandomMode && !isFailedMode) {
                 const nextStart = currentStartIndex + getQuizLength();
                 currentStartIndex = nextStart < currentQuestions.length ? nextStart : 0;
                 currentSequence = buildCurrentSequence();
@@ -8445,8 +8476,9 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('repeatWrongBtn').style.display = 'none';
             document.getElementById('repeatWrongTestBtn').style.display = 'none';
             document.getElementById('continueBtn').style.display = 'none';
-            document.getElementById('normalModeBtn').style.backgroundColor = (!isRandomMode && !isFailedMode) ? '#007bff' : '#6c757d';
+            document.getElementById('normalModeBtn').style.backgroundColor = (!isRandomMode && !isExtremeRandomMode && !isFailedMode) ? '#007bff' : '#6c757d';
             document.getElementById('randomModeBtn').style.backgroundColor = isRandomMode ? '#007bff' : '#6c757d';
+            document.getElementById('extremeRandomModeBtn').style.backgroundColor = isExtremeRandomMode ? '#007bff' : '#6c757d';
             document.getElementById('failedModeBtn').style.backgroundColor = isFailedMode ? '#007bff' : '#6c757d';
             startTimer();
             renderQuestions();
@@ -8461,6 +8493,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             // Note: Keeping wrongCounts and correctCounts for history
             isRandomMode = false;
             isFailedMode = false;
+            isExtremeRandomMode = false;
             isTestMode = false;
             document.getElementById('resultContainer').style.display = 'none';
             document.getElementById('quiz').style.display = 'block';
@@ -8468,6 +8501,7 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
             document.getElementById('normalModeBtn').style.backgroundColor = '#007bff';
             document.getElementById('randomModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('failedModeBtn').style.backgroundColor = '#6c757d';
+            document.getElementById('extremeRandomModeBtn').style.backgroundColor = '#6c757d';
             document.getElementById('continueBtn').style.display = 'none';
             updateScoreDisplay();
             startTimer();

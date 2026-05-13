@@ -8467,6 +8467,8 @@ return Math.min(currentQuestions.length, quizLimit[selectedBank]);        }
                 currentSequence = buildCurrentSequence();
             } else {
                 currentStartIndex = 0;
+                userAnswers[selectedBank] = [];
+                answeredQuestions[selectedBank] = [];
                 currentSequence = buildCurrentSequence();
             }
             currentSequenceIndex = 0;
